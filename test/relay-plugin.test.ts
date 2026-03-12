@@ -71,7 +71,11 @@ describe("relayPlugin", () => {
       throw: false,
     });
     expect(result.success).toBe(false);
-    expect(result.logs.some((l) => l.message.includes("Unexpected empty graphql tag"))).toBe(true);
+    expect(
+      result.logs.some((l) =>
+        l.message.includes("Unexpected empty graphql tag"),
+      ),
+    ).toBe(true);
   });
 
   test("errors on template substitutions", async () => {
@@ -82,7 +86,11 @@ describe("relayPlugin", () => {
       throw: false,
     });
     expect(result.success).toBe(false);
-    expect(result.logs.some((l) => l.message.includes("Substitutions are not allowed"))).toBe(true);
+    expect(
+      result.logs.some((l) =>
+        l.message.includes("Substitutions are not allowed"),
+      ),
+    ).toBe(true);
   });
 
   test("errors on multiple definitions in a single tag", async () => {
@@ -93,7 +101,11 @@ describe("relayPlugin", () => {
       throw: false,
     });
     expect(result.success).toBe(false);
-    expect(result.logs.some((l) => l.message.includes("Expected exactly one definition"))).toBe(true);
+    expect(
+      result.logs.some((l) =>
+        l.message.includes("Expected exactly one definition"),
+      ),
+    ).toBe(true);
   });
 
   test("errors on unnamed operations", async () => {
@@ -104,7 +116,9 @@ describe("relayPlugin", () => {
       throw: false,
     });
     expect(result.success).toBe(false);
-    expect(result.logs.some((l) => l.message.includes("must contain names"))).toBe(true);
+    expect(
+      result.logs.some((l) => l.message.includes("must contain names")),
+    ).toBe(true);
   });
 
   test("errors on invalid definition kinds", async () => {
@@ -115,7 +129,13 @@ describe("relayPlugin", () => {
       throw: false,
     });
     expect(result.success).toBe(false);
-    expect(result.logs.some((l) => l.message.includes("Expected a fragment, mutation, query, or subscription"))).toBe(true);
+    expect(
+      result.logs.some((l) =>
+        l.message.includes(
+          "Expected a fragment, mutation, query, or subscription",
+        ),
+      ),
+    ).toBe(true);
   });
 
   test("errors on invalid graphql syntax", async () => {

@@ -54,17 +54,13 @@ export function relayPlugin(options?: RelayPluginOptions): BunPlugin {
             }
 
             if (body.trim().length === 0) {
-              throw new Error(
-                "BunPluginRelay: Unexpected empty graphql tag.",
-              );
+              throw new Error("BunPluginRelay: Unexpected empty graphql tag.");
             }
 
             const ast = parse(body);
 
             if (ast.definitions.length === 0) {
-              throw new Error(
-                "BunPluginRelay: Unexpected empty graphql tag.",
-              );
+              throw new Error("BunPluginRelay: Unexpected empty graphql tag.");
             }
 
             if (ast.definitions.length !== 1) {
@@ -73,8 +69,10 @@ export function relayPlugin(options?: RelayPluginOptions): BunPlugin {
               );
             }
 
-            // Safe: we checked definitions.length === 1 above
-            const definition = ast.definitions[0]!;
+            const definition = ast.definitions[0] as
+              | import("graphql").FragmentDefinitionNode
+              | import("graphql").OperationDefinitionNode
+              | import("graphql").DefinitionNode;
 
             if (
               definition.kind !== "FragmentDefinition" &&
