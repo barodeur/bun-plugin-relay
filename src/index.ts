@@ -47,7 +47,7 @@ export function relayPlugin(options?: RelayPluginOptions): BunPlugin {
           (_match: string, body: string) => {
             if (body.includes("${")) {
               throw new Error(
-                "BabelPluginRelay: Substitutions are not allowed in " +
+                "BunPluginRelay: Substitutions are not allowed in " +
                   "graphql fragments. Included fragments should be " +
                   "referenced as `...MyModule_propName`.",
               );
@@ -55,7 +55,7 @@ export function relayPlugin(options?: RelayPluginOptions): BunPlugin {
 
             if (body.trim().length === 0) {
               throw new Error(
-                "BabelPluginRelay: Unexpected empty graphql tag.",
+                "BunPluginRelay: Unexpected empty graphql tag.",
               );
             }
 
@@ -63,13 +63,13 @@ export function relayPlugin(options?: RelayPluginOptions): BunPlugin {
 
             if (ast.definitions.length === 0) {
               throw new Error(
-                "BabelPluginRelay: Unexpected empty graphql tag.",
+                "BunPluginRelay: Unexpected empty graphql tag.",
               );
             }
 
             if (ast.definitions.length !== 1) {
               throw new Error(
-                "BabelPluginRelay: Expected exactly one definition per graphql tag.",
+                "BunPluginRelay: Expected exactly one definition per graphql tag.",
               );
             }
 
@@ -81,7 +81,7 @@ export function relayPlugin(options?: RelayPluginOptions): BunPlugin {
               definition.kind !== "OperationDefinition"
             ) {
               throw new Error(
-                "BabelPluginRelay: Expected a fragment, mutation, query, or " +
+                "BunPluginRelay: Expected a fragment, mutation, query, or " +
                   `subscription, got \`${definition.kind}\`.`,
               );
             }
