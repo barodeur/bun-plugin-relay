@@ -74,6 +74,17 @@ relayPlugin({
 });
 ```
 
+## Validation
+
+The plugin parses each `graphql` tagged template with the `graphql` library (matching babel-plugin-relay's behavior) and will fail the build with a clear error if it encounters:
+
+- Empty graphql tags
+- Template literal substitutions (`${}`) — fragments should be referenced as `...MyModule_propName`
+- Multiple definitions in a single tag
+- Unnamed operations or fragments
+- Invalid GraphQL syntax
+- Non-operation/fragment definitions (e.g. schema definitions)
+
 ## How it works
 
 1. `relay-compiler` scans your source for `graphql` tagged templates and generates artifacts in `__generated__/`

@@ -4,11 +4,6 @@ Missing features compared to the official [babel-plugin-relay](https://github.co
 
 ## Validation
 
-- [ ] Parse graphql tags with the `graphql` library instead of regex
-- [ ] Error on empty graphql tags
-- [ ] Error on template substitutions (`${}`)
-- [ ] Error on multiple definitions in a single tag
-- [ ] Error on unnamed operations/fragments
 
 ## Code generation
 
