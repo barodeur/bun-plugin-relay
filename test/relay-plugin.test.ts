@@ -62,4 +62,69 @@ describe("relayPlugin", () => {
     const output = await result.outputs[0]?.text();
     expect(output).toContain("__generated__/LongQuery.graphql");
   });
+
+  test("errors on empty graphql tags", async () => {
+    const result = await Bun.build({
+      entrypoints: [join(FIXTURES, "empty-tag.ts")],
+      outdir: join(import.meta.dir, ".out"),
+      plugins: [relayPlugin()],
+      throw: false,
+    });
+    expect(result.success).toBe(false);
+    expect(result.logs.some((l) => l.message.includes("Unexpected empty graphql tag"))).toBe(true);
+  });
+
+  test("errors on template substitutions", async () => {
+    const result = await Bun.build({
+      entrypoints: [join(FIXTURES, "substitution.ts")],
+      outdir: join(import.meta.dir, ".out"),
+      plugins: [relayPlugin()],
+      throw: false,
+    });
+    expect(result.success).toBe(false);
+    expect(result.logs.some((l) => l.message.includes("Substitutions are not allowed"))).toBe(true);
+  });
+
+  test("errors on multiple definitions in a single tag", async () => {
+    const result = await Bun.build({
+      entrypoints: [join(FIXTURES, "multiple-definitions.ts")],
+      outdir: join(import.meta.dir, ".out"),
+      plugins: [relayPlugin()],
+      throw: false,
+    });
+    expect(result.success).toBe(false);
+    expect(result.logs.some((l) => l.message.includes("Expected exactly one definition"))).toBe(true);
+  });
+
+  test("errors on unnamed operations", async () => {
+    const result = await Bun.build({
+      entrypoints: [join(FIXTURES, "unnamed-query.ts")],
+      outdir: join(import.meta.dir, ".out"),
+      plugins: [relayPlugin()],
+      throw: false,
+    });
+    expect(result.success).toBe(false);
+    expect(result.logs.some((l) => l.message.includes("must contain names"))).toBe(true);
+  });
+
+  test("errors on invalid definition kinds", async () => {
+    const result = await Bun.build({
+      entrypoints: [join(FIXTURES, "invalid-definition.ts")],
+      outdir: join(import.meta.dir, ".out"),
+      plugins: [relayPlugin()],
+      throw: false,
+    });
+    expect(result.success).toBe(false);
+    expect(result.logs.some((l) => l.message.includes("Expected a fragment, mutation, query, or subscription"))).toBe(true);
+  });
+
+  test("errors on invalid graphql syntax", async () => {
+    const result = await Bun.build({
+      entrypoints: [join(FIXTURES, "invalid-graphql.ts")],
+      outdir: join(import.meta.dir, ".out"),
+      plugins: [relayPlugin()],
+      throw: false,
+    });
+    expect(result.success).toBe(false);
+  });
 });
