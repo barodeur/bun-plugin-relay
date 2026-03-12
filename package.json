@@ -44,5 +44,8 @@
   },
   "engines": {
     "bun": ">=1.0.0"
+  },
+  "dependencies": {
+    "cosmiconfig": "^9.0.1"
   }
 }
