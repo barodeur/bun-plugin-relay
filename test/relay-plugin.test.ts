@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { join } from "node:path";
-import { relayPlugin } from "../src/index.ts";
+import { findRelayConfig, relayPlugin } from "../src/index.ts";
 
 const FIXTURES = join(import.meta.dir, "fixtures");
 
@@ -61,5 +61,27 @@ describe("relayPlugin", () => {
     expect(result.success).toBe(true);
     const output = await result.outputs[0]?.text();
     expect(output).toContain("__generated__/LongQuery.graphql");
+  });
+});
+
+describe("findRelayConfig", () => {
+  test("reads from relay.config.json", () => {
+    const config = findRelayConfig(join(FIXTURES, "config-json"));
+    expect(config.artifactDirectory).toBe("__relay__");
+  });
+
+  test("reads from relay.config.js", () => {
+    const config = findRelayConfig(join(FIXTURES, "config-js"));
+    expect(config.artifactDirectory).toBe("__relay__");
+  });
+
+  test("reads from package.json relay key", () => {
+    const config = findRelayConfig(join(FIXTURES, "config-pkg"));
+    expect(config.artifactDirectory).toBe("__relay__");
+  });
+
+  test("returns empty object when no config found", () => {
+    const config = findRelayConfig(join(FIXTURES, "config-none"));
+    expect(config).toEqual({});
   });
 });

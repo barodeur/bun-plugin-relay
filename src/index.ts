@@ -1,4 +1,5 @@
 import type { BunPlugin } from "bun";
+import { cosmiconfigSync } from "cosmiconfig";
 
 export interface RelayPluginOptions {
   /**
@@ -9,10 +10,35 @@ export interface RelayPluginOptions {
 }
 
 /**
+ * Search for a relay config file (`relay.config.js`, `relay.config.json`,
+ * or the `"relay"` key in `package.json`).
+ *
+ * @param searchFrom - Directory to search from (defaults to `process.cwd()`)
+ */
+export function findRelayConfig(
+  searchFrom?: string,
+): Partial<RelayPluginOptions> {
+  const explorer = cosmiconfigSync("relay", {
+    searchPlaces: [
+      "package.json",
+      "relay.config.json",
+      "relay.config.js",
+    ],
+  });
+  const result = explorer.search(searchFrom);
+  if (!result || result.isEmpty) return {};
+  return result.config as Partial<RelayPluginOptions>;
+}
+
+/**
  * Bun build plugin that replaces `graphql` tagged template literals with
  * require() calls to relay-compiler generated artifacts.
  *
  * This does what the Relay Babel plugin does, but for Bun's bundler.
+ *
+ * Options passed directly take precedence over values found in config files.
+ * Config is resolved via cosmiconfig from `relay.config.js`,
+ * `relay.config.json`, or the `"relay"` key in `package.json`.
  *
  * @example
  * ```ts
@@ -26,7 +52,11 @@ export interface RelayPluginOptions {
  * ```
  */
 export function relayPlugin(options?: RelayPluginOptions): BunPlugin {
-  const artifactDir = options?.artifactDirectory ?? "__generated__";
+  const fileConfig = findRelayConfig();
+  const artifactDir =
+    options?.artifactDirectory ??
+    fileConfig.artifactDirectory ??
+    "__generated__";
 
   return {
     name: "bun-plugin-relay",

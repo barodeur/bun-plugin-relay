@@ -20,5 +20,5 @@ Missing features compared to the official [babel-plugin-relay](https://github.co
 
 ## Configuration
 
-- [ ] Read config from `relay.config.js` / `relay.config.json` / `package.json` via cosmiconfig
+- [x] Read config from `relay.config.js` / `relay.config.json` / `package.json` via cosmiconfig
 - [ ] Support absolute `artifactDirectory` with relative path resolution from source file

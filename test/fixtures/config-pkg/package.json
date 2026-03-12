@@ -1,0 +1,6 @@
+{
+  "name": "test-config-pkg",
+  "relay": {
+    "artifactDirectory": "__relay__"
+  }
+}
