@@ -91,23 +91,19 @@ export function relayPlugin(options?: RelayPluginOptions): BunPlugin {
               }
 
               const ast = parse(body);
+              const [definition, ...otherDefinitions] = ast.definitions ?? [];
 
-              if (ast.definitions.length === 0) {
+              if (!definition) {
                 throw new Error(
                   "BunPluginRelay: Unexpected empty graphql tag.",
                 );
               }
 
-              if (ast.definitions.length !== 1) {
+              if (otherDefinitions.length > 0) {
                 throw new Error(
                   "BunPluginRelay: Expected exactly one definition per graphql tag.",
                 );
               }
-
-              const definition = ast.definitions[0] as
-                | import("graphql").FragmentDefinitionNode
-                | import("graphql").OperationDefinitionNode
-                | import("graphql").DefinitionNode;
 
               if (
                 definition.kind !== "FragmentDefinition" &&
