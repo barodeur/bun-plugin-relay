@@ -141,7 +141,11 @@ describe("relayPlugin", () => {
     });
     expect(result.success).toBe(false);
     expect(
-      result.logs.some((l) => l.message.includes("must contain names")),
+      result.logs.some((l) =>
+        l.message.includes(
+          "BunPluginRelay: GraphQL operations and fragments must contain names",
+        ),
+      ),
     ).toBe(true);
   });
 

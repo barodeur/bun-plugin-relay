@@ -61,9 +61,12 @@ export function relayPlugin(options?: RelayPluginOptions): BunPlugin {
       build.onLoad(
         { filter: /\.[jt]sx?$/, namespace: "file" },
         async (args) => {
+          // Skip files in directories that can't contain source graphql tags.
+          // Matches the relay-compiler default excludes plus the artifact dir.
           if (
-            args.path.includes("node_modules") ||
-            args.path.includes(artifactDir)
+            args.path.includes("/node_modules/") ||
+            args.path.includes("/__mocks__/") ||
+            args.path.includes(`/${artifactDir}/`)
           )
             return;
 
@@ -119,7 +122,7 @@ export function relayPlugin(options?: RelayPluginOptions): BunPlugin {
               const definitionName = definition.name?.value;
               if (!definitionName) {
                 throw new Error(
-                  "GraphQL operations and fragments must contain names",
+                  "BunPluginRelay: GraphQL operations and fragments must contain names",
                 );
               }
 
