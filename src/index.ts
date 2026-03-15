@@ -91,8 +91,7 @@ export function relayPlugin(options?: RelayPluginOptions): BunPlugin {
               }
 
               const ast = parse(body);
-              const [definition, ...otherDefinitions] =
-                ast.definitions ?? [];
+              const [definition, ...otherDefinitions] = ast.definitions ?? [];
 
               if (!definition) {
                 throw new Error(
