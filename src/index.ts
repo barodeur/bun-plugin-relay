@@ -95,10 +95,10 @@ export function relayPlugin(options?: RelayPluginOptions): BunPlugin {
               );
             }
 
-            const definition = ast.definitions[0] as
-              | import("graphql").FragmentDefinitionNode
-              | import("graphql").OperationDefinitionNode
-              | import("graphql").DefinitionNode;
+            const definition = ast.definitions[0];
+            if (!definition) {
+              throw new Error("BunPluginRelay: Unexpected empty graphql tag.");
+            }
 
             if (
               definition.kind !== "FragmentDefinition" &&
