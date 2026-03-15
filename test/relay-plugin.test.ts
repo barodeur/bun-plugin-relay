@@ -52,6 +52,30 @@ describe("relayPlugin", () => {
     expect(output).not.toContain("__generated__");
   });
 
+  test("transforms graphql tags in .js files", async () => {
+    const result = await Bun.build({
+      entrypoints: [join(FIXTURES, "basic.js")],
+      outdir: join(import.meta.dir, ".out"),
+      plugins: [relayPlugin()],
+    });
+    expect(result.success).toBe(true);
+    const output = await result.outputs[0]?.text();
+    expect(output).toContain("__generated__/MyQuery.graphql");
+    expect(output).not.toContain("graphql`");
+  });
+
+  test("transforms graphql tags in .jsx files", async () => {
+    const result = await Bun.build({
+      entrypoints: [join(FIXTURES, "basic.jsx")],
+      outdir: join(import.meta.dir, ".out"),
+      plugins: [relayPlugin()],
+    });
+    expect(result.success).toBe(true);
+    const output = await result.outputs[0]?.text();
+    expect(output).toContain("__generated__/MyQuery.graphql");
+    expect(output).not.toContain("graphql`");
+  });
+
   test("handles multiline graphql tags", async () => {
     const result = await Bun.build({
       entrypoints: [join(FIXTURES, "multiline.ts")],
@@ -117,7 +141,11 @@ describe("relayPlugin", () => {
     });
     expect(result.success).toBe(false);
     expect(
-      result.logs.some((l) => l.message.includes("must contain names")),
+      result.logs.some((l) =>
+        l.message.includes(
+          "BunPluginRelay: GraphQL operations and fragments must contain names",
+        ),
+      ),
     ).toBe(true);
   });
 

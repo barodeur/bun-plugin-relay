@@ -58,72 +58,87 @@ export function relayPlugin(options?: RelayPluginOptions): BunPlugin {
   return {
     name: "bun-plugin-relay",
     setup(build) {
-      build.onLoad({ filter: /\.tsx?$/, namespace: "file" }, async (args) => {
-        if (
-          args.path.includes("node_modules") ||
-          args.path.includes(artifactDir)
-        )
-          return;
+      build.onLoad(
+        { filter: /\.[jt]sx?$/, namespace: "file" },
+        async (args) => {
+          // Skip files in directories that can't contain source graphql tags.
+          // Matches the relay-compiler default excludes plus the artifact dir.
+          if (
+            args.path.includes("/node_modules/") ||
+            args.path.includes("/__mocks__/") ||
+            args.path.includes(`/${artifactDir}/`)
+          )
+            return;
 
-        const text = await Bun.file(args.path).text();
-        if (!text.includes("graphql`")) return;
+          const text = await Bun.file(args.path).text();
+          if (!text.includes("graphql`")) return;
 
-        const transformed = text.replace(
-          /\bgraphql\s*`([^`]*)`/g,
-          (_match: string, body: string) => {
-            if (body.includes("${")) {
-              throw new Error(
-                "BunPluginRelay: Substitutions are not allowed in " +
-                  "graphql fragments. Included fragments should be " +
-                  "referenced as `...MyModule_propName`.",
-              );
-            }
+          const transformed = text.replace(
+            /\bgraphql\s*`([^`]*)`/g,
+            (_match: string, body: string) => {
+              if (body.includes("${")) {
+                throw new Error(
+                  "BunPluginRelay: Substitutions are not allowed in " +
+                    "graphql fragments. Included fragments should be " +
+                    "referenced as `...MyModule_propName`.",
+                );
+              }
 
-            if (body.trim().length === 0) {
-              throw new Error("BunPluginRelay: Unexpected empty graphql tag.");
-            }
+              if (body.trim().length === 0) {
+                throw new Error(
+                  "BunPluginRelay: Unexpected empty graphql tag.",
+                );
+              }
 
-            const ast = parse(body);
-            const [definition, ...otherDefinitions] = ast.definitions ?? [];
+              const ast = parse(body);
+              const [definition, ...otherDefinitions] =
+                ast.definitions ?? [];
 
-            if (!definition) {
-              throw new Error("BunPluginRelay: Unexpected empty graphql tag.");
-            }
+              if (!definition) {
+                throw new Error(
+                  "BunPluginRelay: Unexpected empty graphql tag.",
+                );
+              }
 
-            if (otherDefinitions.length > 0) {
-              throw new Error(
-                "BunPluginRelay: Expected exactly one definition per graphql tag.",
-              );
-            }
+              if (otherDefinitions.length > 0) {
+                throw new Error(
+                  "BunPluginRelay: Expected exactly one definition per graphql tag.",
+                );
+              }
 
-            if (
-              definition.kind !== "FragmentDefinition" &&
-              definition.kind !== "OperationDefinition"
-            ) {
-              throw new Error(
-                "BunPluginRelay: Expected a fragment, mutation, query, or " +
-                  `subscription, got \`${definition.kind}\`.`,
-              );
-            }
+              if (
+                definition.kind !== "FragmentDefinition" &&
+                definition.kind !== "OperationDefinition"
+              ) {
+                throw new Error(
+                  "BunPluginRelay: Expected a fragment, mutation, query, or " +
+                    `subscription, got \`${definition.kind}\`.`,
+                );
+              }
 
-            const definitionName = definition.name?.value;
-            if (!definitionName) {
-              throw new Error(
-                "GraphQL operations and fragments must contain names",
-              );
-            }
+              const definitionName = definition.name?.value;
+              if (!definitionName) {
+                throw new Error(
+                  "BunPluginRelay: GraphQL operations and fragments must contain names",
+                );
+              }
 
-            return `require("./${artifactDir}/${definitionName}.graphql")`;
-          },
-        );
+              return `require("./${artifactDir}/${definitionName}.graphql")`;
+            },
+          );
 
-        if (transformed === text) return;
+          if (transformed === text) return;
 
-        return {
-          contents: transformed,
-          loader: args.path.endsWith(".tsx") ? "tsx" : "ts",
-        };
-      });
+          return {
+            contents: transformed,
+            loader: args.path.match(/\.(tsx?|jsx?)$/)?.[1] as
+              | "ts"
+              | "tsx"
+              | "js"
+              | "jsx",
+          };
+        },
+      );
     },
   };
 }
