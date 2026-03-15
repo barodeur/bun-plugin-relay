@@ -113,7 +113,7 @@ export function relayPlugin(options?: RelayPluginOptions): BunPlugin {
             const definitionName = definition.name?.value;
             if (!definitionName) {
               throw new Error(
-                "GraphQL operations and fragments must contain names",
+                "BunPluginRelay: GraphQL operations and fragments must contain names",
               );
             }
 
