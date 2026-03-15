@@ -59,9 +59,12 @@ export function relayPlugin(options?: RelayPluginOptions): BunPlugin {
     name: "bun-plugin-relay",
     setup(build) {
       build.onLoad({ filter: /\.tsx?$/, namespace: "file" }, async (args) => {
+        // Skip files in directories that can't contain source graphql tags.
+        // Matches the relay-compiler default excludes plus the artifact dir.
         if (
-          args.path.includes("node_modules") ||
-          args.path.includes(artifactDir)
+          args.path.includes("/node_modules/") ||
+          args.path.includes("/__mocks__/") ||
+          args.path.includes(`/${artifactDir}/`)
         )
           return;
 
