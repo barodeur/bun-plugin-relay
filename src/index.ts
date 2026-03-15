@@ -131,13 +131,11 @@ export function relayPlugin(options?: RelayPluginOptions): BunPlugin {
 
           return {
             contents: transformed,
-            loader: args.path.endsWith(".tsx")
-              ? "tsx"
-              : args.path.endsWith(".jsx")
-                ? "jsx"
-                : args.path.endsWith(".js")
-                  ? "js"
-                  : "ts",
+            loader: args.path.match(/\.(tsx?|jsx?)$/)?.[1] as
+              | "ts"
+              | "tsx"
+              | "js"
+              | "jsx",
           };
         },
       );
